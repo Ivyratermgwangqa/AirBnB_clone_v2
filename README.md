@@ -11,11 +11,6 @@ AirBnB_clone_v2 is an extended version of the AirBnB_clone project, offering enh
 1. [Introduction](#introduction)
 2. [Project Structure](#project-structure)
 3. [Setup](#setup)
-  - [Bug Free](#bug-free)
-  - [Console Improvements](#console-improvements)
-  - [MySQL Setup Development](#mysql-setup-development)
-  - [MySQL Setup Test](#mysql-setup-test)
-  - [Delete Object](#delete-object)
 4. [Usage](#usage)
 5. [Tasks](#tasks)
     1. [Console](#1-console)
@@ -63,6 +58,25 @@ cd AirBnB_clone_v2
 ```bash
 pip install -r requirements.txt
 ```
+
+## Usage
+
+To use the Airbnb Clone v2 project, follow these steps:
+
+1. Run the interactive console:
+
+```bash
+./console.py
+```
+
+2. Execute commands within the console to manage users, places, amenities, and more.
+
+## Tasks
+
+### 1. Console
+
+The console provides an interactive command-line interface for managing the Airbnb Clone v2 application. It supports commands for creating, updating, and querying various entities.
+
 #### Bug Free
 
 To ensure bug-free functionality, all unit tests must pass without any errors at any time in this project, with each storage engine. Use the following commands to run the tests:
@@ -76,6 +90,10 @@ For MySQL testing:
 ```bash
 HBNB_ENV=test HBNB_MYSQL_USER=hbnb_test HBNB_MYSQL_PWD=hbnb_test_pwd HBNB_MYSQL_HOST=localhost HBNB_MYSQL_DB=hbnb_test_db HBNB_TYPE_STORAGE=db python3 -m unittest discover tests 2>&1 /dev/null | tail -n 1
 ```
+
+### 2. FileStorage
+
+The `FileStorage` module provides functionality for serializing and deserializing objects to and from JSON format. It enables the persistent storage of application data.
 
 #### Console Improvements
 
@@ -102,6 +120,10 @@ create Place city_id="0001" user_id="0001" name="My_little_house" number_rooms=4
 all Place
 ```
 
+### 3. DBStorage - User
+
+The `DBStorage` module introduces database storage using SQLAlchemy for the `User` class. It includes the necessary updates to create, update, and query user data.
+
 #### MySQL Setup Development
 
 Write a script (`setup_mysql_dev.sql`) that prepares a MySQL server for the project with:
@@ -116,6 +138,11 @@ Run the script using:
 ```bash
 cat setup_mysql_dev.sql | mysql -hlocalhost -uroot -p
 ```
+
+### 4. DBStorage - Place
+
+The `DBStorage` module extends database storage to the `Place` class. It includes table definitions, relationships, and foreign key constraints.
+
 
 #### MySQL Setup Test
 
@@ -132,6 +159,10 @@ Run the script using:
 cat setup_mysql_test.sql | mysql -hlocalhost -uroot -p
 ```
 
+### 5. DBStorage - City
+
+The `DBStorage` module updates the `City` class to establish relationships with the `Place` class. It ensures that linked place objects are automatically deleted when a city is deleted.
+
 #### Delete Object
 
 Update `FileStorage` (`models/engine/file_storage.py`) to include a new public instance method `delete(self, obj=None)`:
@@ -139,39 +170,6 @@ Update `FileStorage` (`models/engine/file_storage.py`) to include a new public i
 - Delete `obj` from `__objects` if it's inside. If `obj` is `None`, the method should do nothing.
 - Update the prototype of `all(self)` to `all(self, cls=None)` to return a list of objects of one type of class if `cls` is provided.
 
-## Usage
-
-To use the Airbnb Clone v2 project, follow these steps:
-
-1. Run the interactive console:
-
-```bash
-./console.py
-```
-
-2. Execute commands within the console to manage users, places, amenities, and more.
-
-## Tasks
-
-### 1. Console
-
-The console provides an interactive command-line interface for managing the Airbnb Clone v2 application. It supports commands for creating, updating, and querying various entities.
-
-### 2. FileStorage
-
-The `FileStorage` module provides functionality for serializing and deserializing objects to and from JSON format. It enables the persistent storage of application data.
-
-### 3. DBStorage - User
-
-The `DBStorage` module introduces database storage using SQLAlchemy for the `User` class. It includes the necessary updates to create, update, and query user data.
-
-### 4. DBStorage - Place
-
-The `DBStorage` module extends database storage to the `Place` class. It includes table definitions, relationships, and foreign key constraints.
-
-### 5. DBStorage - City
-
-The `DBStorage` module updates the `City` class to establish relationships with the `Place` class. It ensures that linked place objects are automatically deleted when a city is deleted.
 
 ### 6. DBStorage - State
 
