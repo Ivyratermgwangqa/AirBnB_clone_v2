@@ -1,6 +1,6 @@
 # AirBnB_clone_v2
 
-![AirBnB_clone_v2 Logo](path/to/your/logo.png)
+![AirBnB_clone_v2 Logo]((https://s3.amazonaws.com/intranet-projects-files/concepts/74/hbnb_step2.png)
 
 ## Overview
 
