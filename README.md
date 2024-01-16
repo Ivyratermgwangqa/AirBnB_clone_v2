@@ -63,7 +63,7 @@ cd AirBnB_clone_v2
 ```bash
 pip install -r requirements.txt
 ```
-### Bug Free
+#### Bug Free
 
 To ensure bug-free functionality, all unit tests must pass without any errors at any time in this project, with each storage engine. Use the following commands to run the tests:
 
@@ -75,7 +75,69 @@ For MySQL testing:
 
 ```bash
 HBNB_ENV=test HBNB_MYSQL_USER=hbnb_test HBNB_MYSQL_PWD=hbnb_test_pwd HBNB_MYSQL_HOST=localhost HBNB_MYSQL_DB=hbnb_test_db HBNB_TYPE_STORAGE=db python3 -m unittest discover tests 2>&1 /dev/null | tail -n 1
-```#
+```
+
+#### Console Improvements
+
+Update the `do_create(self, arg)` function in your command interpreter (`console.py`) to allow for object creation with given parameters. The command syntax is as follows:
+
+```bash
+create <Class name> <param 1> <param 2> <param 3>...
+```
+
+Param syntax:
+
+- String: `<key name>="<value>"` (escape double quotes with a backslash `\` and replace underscores `_` with spaces)
+- Float: `<unit>.<decimal>`
+- Integer: `<number>`
+
+Example:
+
+```bash
+create State name="California"
+create State name="Arizona"
+all State
+
+create Place city_id="0001" user_id="0001" name="My_little_house" number_rooms=4 number_bathrooms=2 max_guest=10 price_by_night=300 latitude=37.773972 longitude=-122.431297
+all Place
+```
+
+#### MySQL Setup Development
+
+Write a script (`setup_mysql_dev.sql`) that prepares a MySQL server for the project with:
+
+- Database: hbnb_dev_db
+- User: hbnb_dev (password: hbnb_dev_pwd)
+- All privileges on hbnb_dev_db for hbnb_dev
+- SELECT privilege on performance_schema for hbnb_dev
+
+Run the script using:
+
+```bash
+cat setup_mysql_dev.sql | mysql -hlocalhost -uroot -p
+```
+
+#### MySQL Setup Test
+
+Write a script (`setup_mysql_test.sql`) that prepares a MySQL server for testing with:
+
+- Database: hbnb_test_db
+- User: hbnb_test (password: hbnb_test_pwd)
+- All privileges on hbnb_test_db for hbnb_test
+- SELECT privilege on performance_schema for hbnb_test
+
+Run the script using:
+
+```bash
+cat setup_mysql_test.sql | mysql -hlocalhost -uroot -p
+```
+
+#### Delete Object
+
+Update `FileStorage` (`models/engine/file_storage.py`) to include a new public instance method `delete(self, obj=None)`:
+
+- Delete `obj` from `__objects` if it's inside. If `obj` is `None`, the method should do nothing.
+- Update the prototype of `all(self)` to `all(self, cls=None)` to return a list of objects of one type of class if `cls` is provided.
 
 ## Usage
 
@@ -134,115 +196,6 @@ The `DBStorage` module introduces the `Amenity` class and establishes a Many-To-
 **Note**: For detailed instructions on each task, please refer to the specific sections in the README corresponding to each task.
 
 You are now ready to use the Airbnb Clone v2 project! If you encounter any issues or have questions, refer to the documentation or contact the project maintainers. Happy coding!
-
-
-# AirBnB_clone_v2
-
-![AirBnB_clone_v2 Logo](path/to/your/logo.png)
-
-## Overview
-
-AirBnB_clone_v2 is an extended version of the AirBnB_clone project, offering enhanced features and functionalities. This collaborative effort builds upon the existing AirBnB_clone codebase, implementing tasks related to database storage, model updates, and relationships between different classes.
-
-## Table of Contents
-
-- [Tasks](#tasks)
- 
-
-## Tasks
-
-
-
-Remember to skip irrelevant tests for specific storage engines.
-
-### Console Improvements
-
-Update the `do_create(self, arg)` function in your command interpreter (`console.py`) to allow for object creation with given parameters. The command syntax is as follows:
-
-```bash
-create <Class name> <param 1> <param 2> <param 3>...
-```
-
-Param syntax:
-
-- String: `<key name>="<value>"` (escape double quotes with a backslash `\` and replace underscores `_` with spaces)
-- Float: `<unit>.<decimal>`
-- Integer: `<number>`
-
-Example:
-
-```bash
-create State name="California"
-create State name="Arizona"
-all State
-
-create Place city_id="0001" user_id="0001" name="My_little_house" number_rooms=4 number_bathrooms=2 max_guest=10 price_by_night=300 latitude=37.773972 longitude=-122.431297
-all Place
-```
-
-### MySQL Setup Development
-
-Write a script (`setup_mysql_dev.sql`) that prepares a MySQL server for the project with:
-
-- Database: hbnb_dev_db
-- User: hbnb_dev (password: hbnb_dev_pwd)
-- All privileges on hbnb_dev_db for hbnb_dev
-- SELECT privilege on performance_schema for hbnb_dev
-
-Run the script using:
-
-```bash
-cat setup_mysql_dev.sql | mysql -hlocalhost -uroot -p
-```
-
-### MySQL Setup Test
-
-Write a script (`setup_mysql_test.sql`) that prepares a MySQL server for testing with:
-
-- Database: hbnb_test_db
-- User: hbnb_test (password: hbnb_test_pwd)
-- All privileges on hbnb_test_db for hbnb_test
-- SELECT privilege on performance_schema for hbnb_test
-
-Run the script using:
-
-```bash
-cat setup_mysql_test.sql | mysql -hlocalhost -uroot -p
-```
-
-### Delete Object
-
-Update `FileStorage` (`models/engine/file_storage.py`) to include a new public instance method `delete(self, obj=None)`:
-
-- Delete `obj` from `__objects` if it's inside. If `obj` is `None`, the method should do nothing.
-- Update the prototype of `all(self)` to `all(self, cls=None)` to return a list of objects of one type of class if `cls` is provided.
-
-### DBStorage - States and Cities
-
-Update `BaseModel` (`models/base_model.py`) to use SQLAlchemy and include changes to `City` and `State`. Introduce a new engine, `DBStorage` (`models/engine/db_storage.py`), and create tables in the database.
-
-### DBStorage - User
-
-Update `User` (`models/user.py`) to use SQLAlchemy and include the necessary attributes. Introduce the user table and implement the corresponding methods for database storage.
-
-## Getting Started
-
-To get started with the AirBnB_clone_v2 project, follow these steps:
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/your-username/AirBnB_clone_v2.git
-   ```
-
-2. Install dependencies:
-
-   ```bash
-   cd AirBnB_clone_v2
-   pip install -r requirements.txt
-   ```
-
-3. Run the main script or individual test scripts as needed.
 
 ## Contributing
 
