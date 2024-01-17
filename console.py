@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """ Console Module """
+import shlex
 import cmd
 import sys
 from models.base_model import BaseModel
@@ -118,13 +119,23 @@ class HBNBCommand(cmd.Cmd):
         if not args:
             print("** class name missing **")
             return
-        elif args not in HBNBCommand.classes:
-            print("** class doesn't exist **")
-            return
-        new_instance = HBNBCommand.classes[args]()
-        storage.save()
-        print(new_instance.id)
-        storage.save()
+            
+            arg_list = shlex.split(args)
+            class_name = arg_list[0]
+            
+            if class_name not in HBNBCommand.classes:
+                print("** class doesn't exist **")
+                return
+
+    # Extract parameters from the argument list
+    parameters = {}
+    for param in arg_list[1:]:
+        key, value = param.split('=')
+        parameters[key] = value.replace('_', ' ')
+
+    new_instance = HBNBCommand.classes[class_name](**parameters)
+    new_instance.save()
+    print(new_instance.id)
 
     def help_create(self):
         """ Help information for the create method """
@@ -222,98 +233,60 @@ class HBNBCommand(cmd.Cmd):
 
     def do_count(self, args):
         """Count current number of class instances"""
-        count = 0
-        for k, v in storage._FileStorage__objects.items():
-            if args == k.split('.')[0]:
-                count += 1
-        print(count)
+        args = args.partition(' ')
+        if args[0]:
+            count = sum(1 for k in storage.all() if args[0] == k.split('.')[0])
+            print(count)
+        else:
+            print("** class name missing **")
 
     def help_count(self):
         """ """
         print("Usage: count <class_name>")
-
+        
     def do_update(self, args):
         """ Updates a certain object with new info """
-        c_name = c_id = att_name = att_val = kwargs = ''
+        args = args.split()
 
-        # isolate cls from id/args, ex: (<cls>, delim, <id/args>)
-        args = args.partition(" ")
-        if args[0]:
-            c_name = args[0]
-        else:  # class name not present
-            print("** class name missing **")
-            return
-        if c_name not in HBNBCommand.classes:  # class name invalid
-            print("** class doesn't exist **")
-            return
+    if not args:
+        print("** class name missing **")
+        return
 
-        # isolate id from args
-        args = args[2].partition(" ")
-        if args[0]:
-            c_id = args[0]
-        else:  # id not present
-            print("** instance id missing **")
-            return
+    class_name = args[0]
+    if class_name not in HBNBCommand.classes:
+        print("** class doesn't exist **")
+        return
 
-        # generate key from class and id
-        key = c_name + "." + c_id
+    if len(args) < 2:
+        print("** instance id missing **")
+        return
 
-        # determine if key is present
-        if key not in storage.all():
-            print("** no instance found **")
-            return
+    instance_id = args[1]
+    key = f"{class_name}.{instance_id}"
 
-        # first determine if kwargs or args
-        if '{' in args[2] and '}' in args[2] and type(eval(args[2])) is dict:
-            kwargs = eval(args[2])
-            args = []  # reformat kwargs into list, ex: [<name>, <value>, ...]
-            for k, v in kwargs.items():
-                args.append(k)
-                args.append(v)
-        else:  # isolate args
-            args = args[2]
-            if args and args[0] is '\"':  # check for quoted arg
-                second_quote = args.find('\"', 1)
-                att_name = args[1:second_quote]
-                args = args[second_quote + 1:]
+    if key not in storage.all():
+        print("** no instance found **")
+        return
 
-            args = args.partition(' ')
+    if len(args) < 3:
+        print("** attribute name missing **")
+        return
 
-            # if att_name was not quoted arg
-            if not att_name and args[0] is not ' ':
-                att_name = args[0]
-            # check for quoted val arg
-            if args[2] and args[2][0] is '\"':
-                att_val = args[2][1:args[2].find('\"', 1)]
+    attribute_name = args[2]
 
-            # if att_val was not quoted arg
-            if not att_val and args[2]:
-                att_val = args[2].partition(' ')[0]
+    if len(args) < 4:
+        print("** value missing **")
+        return
 
-            args = [att_name, att_val]
+    attribute_value = args[3]
 
-        # retrieve dictionary of current objects
-        new_dict = storage.all()[key]
+    # Type casting as necessary
+    if attribute_name in HBNBCommand.types:
+        attribute_value = HBNBCommand.types[attribute_name](attribute_value)
 
-        # iterate through attr names and values
-        for i, att_name in enumerate(args):
-            # block only runs on even iterations
-            if (i % 2 == 0):
-                att_val = args[i + 1]  # following item is value
-                if not att_name:  # check for att_name
-                    print("** attribute name missing **")
-                    return
-                if not att_val:  # check for att_value
-                    print("** value missing **")
-                    return
-                # type cast as necessary
-                if att_name in HBNBCommand.types:
-                    att_val = HBNBCommand.types[att_name](att_val)
-
-                # update dictionary with name, value pair
-                new_dict.__dict__.update({att_name: att_val})
-
-        new_dict.save()  # save updates to file
+    instance = storage.all()[key]
+    setattr(instance, attribute_name, attribute_value)
+    instance.save()
 
     def help_update(self):
         """ Help information for the update class """
