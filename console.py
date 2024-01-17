@@ -51,8 +51,7 @@ class HBNBCommand(cmd.Cmd):
         """
     _cmd = _cls = _id = _args = ''  # initialize line elements
 
-    # scan for general formating - i.e '.', '(', ')'
-    if not ('.' in line and '(' in line and ')' in line):
+   if not ('.' in line and '(' in line and ')' in line):
         return line
 
     try:  # parse line left to right
