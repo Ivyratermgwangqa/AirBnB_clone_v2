@@ -44,11 +44,11 @@ class HBNBCommand(cmd.Cmd):
             print("(hbnb)")
             
     def precmd(self, line):
-    """Reformat command line for advanced command syntax.
-
-    Usage: <class name>.<command>([<id> [<*args> or <**kwargs>]])
-    (Brackets denote optional fields in usage example.)
-    """
+        """Reformat command line for advanced command syntax.
+        
+        Usage: <class name>.<command>([<id> [<*args> or <**kwargs>]])
+        (Brackets denote optional fields in usage example.)
+        """
     _cmd = _cls = _id = _args = ''  # initialize line elements
 
     # scan for general formating - i.e '.', '(', ')'
