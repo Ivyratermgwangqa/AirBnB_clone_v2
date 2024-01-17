@@ -243,10 +243,10 @@ class HBNBCommand(cmd.Cmd):
     def help_count(self):
         """ """
         print("Usage: count <class_name>")
-        
+
     def do_update(self, args):
-        """ Updates a certain object with new info """
-        args = args.split()
+    """ Updates a certain object with new info """
+    args = args.split()
 
     if not args:
         print("** class name missing **")
