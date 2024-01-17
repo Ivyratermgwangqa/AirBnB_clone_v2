@@ -245,49 +245,48 @@ class HBNBCommand(cmd.Cmd):
         print("Usage: count <class_name>")
 
     def do_update(self, args):
-    """ Updates a certain object with new info """
-    args = args.split()
-
-    if not args:
-        print("** class name missing **")
-        return
-
-    class_name = args[0]
-    if class_name not in HBNBCommand.classes:
-        print("** class doesn't exist **")
-        return
-
-    if len(args) < 2:
-        print("** instance id missing **")
-        return
-
-    instance_id = args[1]
-    key = f"{class_name}.{instance_id}"
-
-    if key not in storage.all():
-        print("** no instance found **")
-        return
-
-    if len(args) < 3:
-        print("** attribute name missing **")
-        return
-
-    attribute_name = args[2]
-
-    if len(args) < 4:
-        print("** value missing **")
-        return
-
-    attribute_value = args[3]
-
-    # Type casting as necessary
+		""" Updates a certain object with new info """
+		args = args.split()
+		
+		if not args:
+			print("** class name missing **")
+			return
+			
+			class_name = args[0]
+			if class_name not in HBNBCommand.classes:
+				print("** class doesn't exist **")
+				return
+				
+				if len(args) < 2:
+					print("** instance id missing **")
+					return
+					
+					instance_id = args[1]
+					key = f"{class_name}.{instance_id}"
+					
+					if key not in storage.all():
+						print("** no instance found **")
+						return
+						
+						if len(args) < 3:
+							print("** attribute name missing **")
+							return
+							
+							attribute_name = args[2]
+							
+							if len(args) < 4:
+								print("** value missing **")
+								return
+								attribute_value = args[3]
+								
+	# Type casting as necessary
     if attribute_name in HBNBCommand.types:
         attribute_value = HBNBCommand.types[attribute_name](attribute_value)
 
     instance = storage.all()[key]
     setattr(instance, attribute_name, attribute_value)
     instance.save()
-
+	
     def help_update(self):
         """ Help information for the update class """
         print("Updates an object with new information")
