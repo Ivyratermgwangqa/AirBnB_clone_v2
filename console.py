@@ -3,7 +3,7 @@
 import shlex
 import cmd
 import sys
-from models.base_model import BaseModel
+from models.base_model import BaseModel, Base
 from models.__init__ import storage
 from models.user import User
 from models.place import Place
@@ -264,7 +264,7 @@ class HBNBCommand(cmd.Cmd):
             return
 
         instance_id = args[1]
-        key = f"{class_name}.{instance_id}"
+        key = "{}.{}".format(class_name, instance_id) 
 
         if key not in storage.all():
             print("** no instance found **")
