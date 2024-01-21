@@ -1,75 +1,74 @@
 #!/usr/bin/python3
-"""This is the file storage class for AirBnB"""
-import json
-from models.base_model import BaseModel
+
+from models.base_model import Base, BaseModel
 from models.user import User
 from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.place import Place
 from models.review import Review
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, relationship, scoped_session
+import os
+import logging 
 
 
-class FileStorage:
-    """This class serializes instances to a JSON file and
-    deserializes JSON file to instances
-    Attributes:
-        __file_path: path to the JSON file
-        __objects: objects will be stored
-    """
-    __file_path = "file.json"
-    __objects = {}
+class DBStorage:
+    __engine = None
+    __session = None
+
+    def __init__(self):
+        try:
+            HBNB_MYSQL_USER = os.getenv('HBNB_MYSQL_USER')
+            HBNB_MYSQL_PWD = os.getenv('HBNB_MYSQL_PWD')
+            HBNB_MYSQL_HOST = os.getenv('HBNB_MYSQL_HOST')
+            HBNB_MYSQL_DB = os.getenv('HBNB_MYSQL_DB')
+            HBNB_ENV = os.getenv('HBNB_ENV')
+
+            if None in (HBNB_MYSQL_USER, HBNB_MYSQL_PWD, HBNB_MYSQL_HOST, HBNB_MYSQL_DB, HBNB_ENV):
+                raise EnvironmentError("One or more required environment variables are missing.")
+
+            self.__engine = create_engine(f'mysql+mysqldb://{HBNB_MYSQL_USER}:{HBNB_MYSQL_PWD}@{HBNB_MYSQL_HOST}:3306/{HBNB_MYSQL_DB}',
+                                          pool_pre_ping=True)
+            if HBNB_ENV == 'test':
+                Base.metadata.drop_all(bind=self.__engine)
+        except Exception as e:
+            logging.error(f"Error during database initialization: {e}")
+            raise
+            print("Not Found")
 
     def all(self, cls=None):
-        """returns a dictionary
-        Return:
-            returns a dictionary of __object
-        """
-        if cls is not None:
+
+        if cls is None:
+            objs = self.__session.query(State).all()
+            objs.extend(self.__session.query(User).all())
+            objs.extend(self.__session.query(Place).all())
+            objs.extend(self.__session.query(Amenity).all())
+            objs.extend(self.__session.query(City).all())
+            objs.extend(self.__session.query(Review).all())
+        else:
             if type(cls) == str:
                 cls = eval(cls)
-            class_dict = {}
-            for key, val in self.__objects.items():
-                if type(val) == cls:
-                    class_dict[key] = val
-            return class_dict
-        return self.__objects
+            objs = self.__session.query(cls)
+        return {"{}.{}".format(type(obj).__name__, obj.id): obj
+                for obj in objs}
 
     def new(self, obj):
-        """sets __object to given obj
-        Args:
-            obj: given object
-        """
-        self.__objects["{}.{}".format(type(obj).__name__, obj.id)] = obj
+        self.__session.add(obj)
 
     def save(self):
-        """serialize the file path to JSON file path
-        """
-        obj_dict = {obj: self.__objects[obj].to_dict()
-                    for obj in self.__objects.keys()}
-        with open(self.__file_path, 'w', encoding="UTF-8") as f:
-            json.dump(obj_dict, f)
-
-    def reload(self):
-        """serialize the file path to JSON file path
-        """
-        try:
-            with open(self.__file_path, 'r', encoding="UTF-8") as f:
-                for obj in json.load(f).values():
-                    name = obj["__class__"]
-                    del obj["__class__"]
-                    self.new(eval(name)(**obj))
-        except FileNotFoundError:
-            pass
+        self.__session.commit()
 
     def delete(self, obj=None):
-        """Delete object from self objects if exists
-        """
-        try:
-            del self.__objects["{}.{}".format(type(obj).__name__, obj.id)]
-        except (AttributeError, KeyError):
-            pass
+        if obj is not None:
+            self.__session.delete(obj)
+
+    def reload(self):
+        Base.metadata.create_all(self.__engine)
+        sess = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        Session = scoped_session(sess)
+        self.__session = Session()
 
     def close(self):
-        """reload method."""
-        self.reload()
+        """Close SQLAlchemy session."""
+        self.__session.close()
