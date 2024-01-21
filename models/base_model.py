@@ -65,4 +65,4 @@ class BaseModel:
         return my_dict
 
     def delete(self):
-        models.storage.dele
+        models.storage.delete(self)
