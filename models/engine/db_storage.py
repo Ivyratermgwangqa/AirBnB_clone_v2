@@ -10,7 +10,6 @@ from models.review import Review
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, relationship, scoped_session
 import os
-import logging 
 
 
 class DBStorage:
@@ -18,22 +17,22 @@ class DBStorage:
     __session = None
 
     def __init__(self):
+        HBNB_MYSQL_USER = os.getenv('HBNB_MYSQL_USER')
+        HBNB_MYSQL_PWD = os.getenv('HBNB_MYSQL_PWD')
+        HBNB_MYSQL_HOST = os.getenv('HBNB_MYSQL_HOST')
+        HBNB_MYSQL_DB = os.getenv('HBNB_MYSQL_DB')
+        HBNB_ENV = os.getenv('HBNB_ENV')
+
         try:
-            HBNB_MYSQL_USER = os.getenv('HBNB_MYSQL_USER')
-            HBNB_MYSQL_PWD = os.getenv('HBNB_MYSQL_PWD')
-            HBNB_MYSQL_HOST = os.getenv('HBNB_MYSQL_HOST')
-            HBNB_MYSQL_DB = os.getenv('HBNB_MYSQL_DB')
-            HBNB_ENV = os.getenv('HBNB_ENV')
-
-            if None in (HBNB_MYSQL_USER, HBNB_MYSQL_PWD, HBNB_MYSQL_HOST, HBNB_MYSQL_DB, HBNB_ENV):
-                raise EnvironmentError("One or more required environment variables are missing.")
-
-            self.__engine = create_engine(f'mysql+mysqldb://{HBNB_MYSQL_USER}:{HBNB_MYSQL_PWD}@{HBNB_MYSQL_HOST}:3306/{HBNB_MYSQL_DB}',
+            self.__engine = create_engine('mysql+mysqldb://{}:{}@{}:3306/{}'
+                                          .format(HBNB_MYSQL_USER,
+                                                  HBNB_MYSQL_PWD,
+                                                  HBNB_MYSQL_HOST,
+                                                  HBNB_MYSQL_DB),
                                           pool_pre_ping=True)
-            if HBNB_ENV == 'test':
+            if HBNB_ENV is 'test':
                 Base.metadata.drop_all(bind=self.__engine)
-        except Exception as e:
-            logging.error(f"Error during database initialization: {e}")
+        except:
             raise
             print("Not Found")
 
